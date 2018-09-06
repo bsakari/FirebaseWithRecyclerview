@@ -1,6 +1,7 @@
 package com.king.firebaseimages;
 
 import android.content.Context;
+import android.graphics.ColorSpace;
 import android.support.v7.widget.RecyclerView;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHolder> {
@@ -39,7 +41,7 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
 //                .fit().centerInside().into(holder.imageView);
         //This has centerCrop()
 
-        Picasso.with(mContext).load(uploadCurrent.getmImageUrl()).placeholder(R.mipmap.ic_launcher).fit()
+        Picasso.with(mContext).load(uploadCurrent.getmImageUrl()).placeholder(R.mipmap.defaultimg).fit()
                 .centerInside().into(holder.imageView);
     }
 
@@ -110,5 +112,11 @@ public class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ImageViewHol
     }
     public void setOnItemClickListener(OnItemClickListener listener){
         mListener = listener;
+    }
+
+    public void setSearchOperation(List<Upload> newList){
+        mUploads = new ArrayList<>();
+        mUploads.addAll(newList);
+        notifyDataSetChanged();
     }
 }

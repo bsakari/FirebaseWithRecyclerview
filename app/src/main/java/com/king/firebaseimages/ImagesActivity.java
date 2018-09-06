@@ -1,12 +1,16 @@
 package com.king.firebaseimages;
 
+import android.app.SearchManager;
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -31,6 +35,7 @@ public class ImagesActivity extends AppCompatActivity implements ImageAdapter.On
     private DatabaseReference mDatabaseRef;
     private ValueEventListener mDBListener;
     private List<Upload> mUploads;
+    private android.support.v7.widget.SearchView searchView;
 
 
     @Override
@@ -107,5 +112,41 @@ public class ImagesActivity extends AppCompatActivity implements ImageAdapter.On
     protected void onDestroy() {
         super.onDestroy();
         mDatabaseRef.removeEventListener(mDBListener);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.toolbar_menu,menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        searchView = (android.support.v7.widget.SearchView) menu.findItem(R.id.action_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setMaxWidth(Integer.MAX_VALUE);
+        searchView.setQueryHint("Search");
+                        //or
+        //searchView.setQueryHint(getString(R.string.search));
+        searchView.setOnQueryTextListener(new android.support.v7.widget.SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String s) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                newText = newText.toLowerCase();
+                List<Upload> virtualList = new ArrayList<>();
+                for (Upload upload:mUploads){
+                    String item = upload.getmName().toLowerCase();
+                    if (item.contains(newText)){
+                        virtualList.add(upload);
+                    mAdapter.setSearchOperation(virtualList);
+                    }else {
+                        mAdapter.setSearchOperation(mUploads);
+                        Toast.makeText(ImagesActivity.this, "No Item Found", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                return false;
+            }
+        });
+        return true;
     }
 }
